@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 keilkill.bat
-Output/
 Project/
 
 #Keil Output
@@ -65,8 +63,5 @@ Project/
 modules.order
 Module.symvers
 Mkfile.old
-<<<<<<< HEAD
+
 dkms.conf
-=======
-dkms.conf
->>>>>>> ae4227a0fe3bf3b78d63ffe13d6d1393790c26e9
