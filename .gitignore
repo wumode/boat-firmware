@@ -1,3 +1,19 @@
+<<<<<<< HEAD
+keilkill.bat
+Output/
+Project/
+
+#Keil Output
+*.crf
+*.htm
+*.hex
+*.sct
+*.lnp
+*.iex
+*.axf
+
+=======
+>>>>>>> ae4227a0fe3bf3b78d63ffe13d6d1393790c26e9
 # Prerequisites
 *.d
 
@@ -49,4 +65,8 @@
 modules.order
 Module.symvers
 Mkfile.old
+<<<<<<< HEAD
 dkms.conf
+=======
+dkms.conf
+>>>>>>> ae4227a0fe3bf3b78d63ffe13d6d1393790c26e9
