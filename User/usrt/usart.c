@@ -392,24 +392,24 @@ void UART4_IRQHandler(void)
 	u8 Res;
 	if(USART_GetFlagStatus(UART4,USART_IT_RXNE)!=RESET)
 	{
-			Res =USART_ReceiveData(UART4);		
-			USART_ClearFlag(UART4, USART_IT_RXNE);
-			if(control_power_data.host ==3)
-			{ 			
-				if(Res == 0x0a)
-				{
-					openmv_rx[Pos] = Res;
-					Pos = 0;
-				}
-				else
-				{
-					openmv_rx[Pos] = Res;
-					Pos++;
-				} 
-				//laser_set = 3;
-				laser_set = openmv_rx[0];
-				//printf("%c",laser_set);
+		Res =USART_ReceiveData(UART4);		
+		USART_ClearFlag(UART4, USART_IT_RXNE);
+		if(control_power_data.host ==3)
+		{ 			
+			if(Res == 0x0a)
+			{
+				openmv_rx[Pos] = Res;
+				Pos = 0;
 			}
+			else
+			{
+				openmv_rx[Pos] = Res;
+				Pos++;
+			} 
+			//laser_set = 3;
+			laser_set = openmv_rx[0];
+			//printf("%c",laser_set);
+		}
 		/*************************************************************/
 		if(control_power_data.host ==2)
 		{

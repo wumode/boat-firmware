@@ -80,9 +80,24 @@ void DT_Send_ControlPower(const ControlPowerTrans* control_power_data_trans) {
     uint8_t data_length = sizeof(ControlPowerTrans);
     tx_buffer_[0] = send_head_high_;
     tx_buffer_[1] = send_head_low_;
-    tx_buffer_[2] = VELOCITY_FLAG;
+    tx_buffer_[2] = CONTROL_POWER_FLAG;
     tx_buffer_[3] = sizeof(ControlPowerTrans);
     memcpy(tx_buffer_+4, (void*)control_power_data_trans, data_length);
+    uint8_t sum = 0;
+    for (int i = 0; i < data_length+4; i++) {
+        sum += tx_buffer_[i];
+    }
+    tx_buffer_[data_length+4] = sum;
+    DT_Send_Data(tx_buffer_, (uint8_t)(data_length+5));
+}
+
+void DT_Send_Locking(const LockingTrans* locking_data_trans){
+	uint8_t data_length = sizeof(LockingTrans);
+    tx_buffer_[0] = send_head_high_;
+    tx_buffer_[1] = send_head_low_;
+    tx_buffer_[2] = LOCKING_FLAG;
+    tx_buffer_[3] = sizeof(LockingTrans);
+    memcpy(tx_buffer_+4, (void*)locking_data_trans, data_length);
     uint8_t sum = 0;
     for (int i = 0; i < data_length+4; i++) {
         sum += tx_buffer_[i];
@@ -110,6 +125,10 @@ void DT_ControlPower_Parse(u8* buffer, ControlPowerTrans* control_power_data_tra
 
 void DT_Empower_Parse(u8* buffer, EmpowerTrans* empower_trans) {
     memcpy(empower_trans, buffer, sizeof(EmpowerTrans));
+}
+
+void DT_Stop_Parse(u8* buffer, StopTrans* stop_trans) {
+    memcpy(stop_trans, buffer, sizeof(StopTrans));
 }
 
 /*----------------------------------------------------------
@@ -152,6 +171,9 @@ void DT_Data_Receive_Anl(u8 *data_buf, u8 num)
 	}
 	else if(*(data_buf + 2) == EMPOWER_FLAG) {
 		DT_Empower_Parse(data_buf + 4, &empower_data);
+	}
+	else if(*(data_buf + 2) == STOP_FLAG){
+		DT_Stop_Parse(data_buf + 4, &stop_data);
 	}
 }
 

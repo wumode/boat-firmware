@@ -26,7 +26,6 @@ void TimingDelay_Decrement(void){
 }
 
 void SpeedAnalyze(const VelocityDataTrans* velocity_data ,MotorPwm* motor_pwm){
-	
 	motor_pwm->right = PWM_TIM_Pause + (int)(velocity_data->velocity_x * PROPULSION_COFFICENT);
 	motor_pwm->left = PWM_TIM_Pause + (int)(velocity_data->velocity_x * PROPULSION_COFFICENT);
 	//motor_pwm->left = PWM_TIM_Pause;
@@ -44,10 +43,18 @@ void SpeedAnalyze(const VelocityDataTrans* velocity_data ,MotorPwm* motor_pwm){
 }
 
 void PwmApplicate(const MotorPwm* motor_pwm){
-	PwmSet(motor_pwm->right, 1);
-	PwmSet(motor_pwm->left, 2);
-	PwmSet(motor_pwm->lateral_push_right, 3);
-	PwmSet(motor_pwm->lateral_push_left, 4);
+	if(stop_motor){
+		PwmSet(PWM_TIM_Pause, 1);
+		PwmSet(PWM_TIM_Pause, 2);
+		PwmSet(LATERAL_TIM_PAUSE, 3);
+		PwmSet(LATERAL_TIM_PAUSE, 4);
+	}
+	else{
+		PwmSet(motor_pwm->right, 1);
+		PwmSet(motor_pwm->left, 2);
+		PwmSet(motor_pwm->lateral_push_right, 3);
+		PwmSet(motor_pwm->lateral_push_left, 4);
+	}
 }
 
 void LimitPwm(MotorPwm* motor_pwm){
@@ -127,22 +134,22 @@ void trace_control(void)
 {
 	MotorPwm motor_trace_pwm;
 	trace_error_ori = 80 - trace_pot_x; 
-  trace_error = 0.01*trace_error_ori + 0*(trace_error_ori-trace_error_last);
-  trace_error_last = trace_error_ori;
+	trace_error = 0.01*trace_error_ori + 0*(trace_error_ori-trace_error_last);
+	trace_error_last = trace_error_ori;
 	if(trace_stop_flag == 0)
-  {
+	{
 		velocity_data.velocity_angle = trace_error;
-	  velocity_data.velocity_x = 1-0.2*fabs(trace_error);
-			}
+		velocity_data.velocity_x = 1-0.2*fabs(trace_error);
+	}
 	else
 	{
-		 velocity_data.velocity_angle=0;
-		 velocity_data.velocity_x=0;
+		velocity_data.velocity_angle=0;
+		velocity_data.velocity_x=0;
 	}
 	SpeedAnalyze(&velocity_data, &motor_trace_pwm);
-		LimitPwm(&motor_trace_pwm);
-		//printf("pw_tracem: %;d-%d\n", motor_pwm.right, motor_pwm.left);
-		PwmApplicate(&motor_trace_pwm);
+	LimitPwm(&motor_trace_pwm);
+	//printf("pw_tracem: %;d-%d\n", motor_pwm.right, motor_pwm.left);
+	PwmApplicate(&motor_trace_pwm);
 
 }
 void mode_choose_openmv(void)
@@ -193,16 +200,42 @@ void MotorInit(){
 }
 
 
+void LaserInit(void){
+	int num = 0;
+	uint8_t s = 0;
+	while(num <= 150){
+		IWDG_ReloadCounter();
+		TimingDelay = INTERRUPTION_FREQUENCY/FREQUENCY;
+		SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
+		num++;
+		if(num%3 == 0){
+			if(s){
+				s = 0;
+			}
+			else{
+				s = 1;
+			}
+			LaserControl(s, num*12);
+		}
+		while(TimingDelay!=0x00);
+	}
+	LaserControl(0, num*10);
+}
+
 void control(void){
 	uint16_t location_time = 0;
 	uint16_t read_remote_channel_time = 0;
-	u8 A;
+//u8 A;
 	MotorPwm motor_pwm;
 	motor_pwm.left = PWM_TIM_Pause;
 	motor_pwm.right = PWM_TIM_Pause;
 	motor_pwm.lateral_push_left = LATERAL_TIM_PAUSE;
 	motor_pwm.lateral_push_right = LATERAL_TIM_PAUSE;
 	MotorInit();
+	int j = 0;
+	for(j=0;j<3;j++){
+			LaserInit();
+	}
 	while(1){
 		IWDG_ReloadCounter();		//Î¹¹·
 		TimingDelay = INTERRUPTION_FREQUENCY/FREQUENCY;
@@ -239,23 +272,42 @@ void control(void){
 //			ServoPwmSet(cradle_pwm.servo_up, 1);
 //			ServoPwmSet(cradle_pwm.servo_down, 2);
 //		}
-    if(control_power_data.host ==2)
-	  {
-		 trace_control();
-	  }
-   if(control_power_data.host ==3)
-	 {
-		 velocity_data.velocity_angle=0;
-		 velocity_data.velocity_x=0;
-		 SpeedAnalyze(&velocity_data, &motor_pwm);
-	    LimitPwm(&motor_pwm);
-	//printf("pw_tracem: %;d-%d\n", motor_pwm.right, motor_pwm.left);
-	    PwmApplicate(&motor_pwm);
-	 }
+		if(control_power_data.host == 2)
+		{
+			trace_control();
+		}
+		if(control_power_data.host == 3)
+		{
+			velocity_data.velocity_angle=0;
+			velocity_data.velocity_x=0;
+			SpeedAnalyze(&velocity_data, &motor_pwm);
+			LimitPwm(&motor_pwm);
+			//printf("pw_tracem: %;d-%d\n", motor_pwm.right, motor_pwm.left);
+			PwmApplicate(&motor_pwm);
+		}
+		 
+		if(laser_set!=last_laser_set){
+			if(laser_set){
+				locking_data.locking = 1;
+			}
+			else{
+				locking_data.locking = 0;
+			}
+			last_laser_set = laser_set;
+			DT_Send_Locking(&locking_data);
+		 }
+		if(stop_data.stop){
+			stop_laser = 1;
+			stop_motor = 1;
+		}
+		else{
+			stop_laser = 0;
+			stop_motor = 0;
+		}
 		//ServoPwmSet(1500, 1);
 		//printf("channel: %d-%d\n", remote_channel_data.channel_1, remote_channel_data.channel_2);
 		//printf("%f-%f\n", velocity_data.velocity_x, velocity_data.velocity_angle);
-		
+			
 		//PwmSet(&motor_pwm);
 		//Remote(&remote_channel_data, &motor_pwm);
 		//LimitPwm(&motor_pwm);
@@ -266,14 +318,13 @@ void control(void){
 		//PwmApplicate(&motor_pwm);
 		//LaserSetPwm(6000);
 		Laser_control();
-		//USART_SendData(UART4,2);
 		mode_choose_openmv();
 		//TIM1->CCR1 = 6000;
 		//A=GPIO_ReadOutputDataBit(GPIOE,GPIO_Pin_9);
-	// printf("control host: %d\n",control_power_data.host);
-	//printf("empower: %d\n", empower_data.empower);
-	printf("%d",trace_pot_x);
-	printf("%d\n",trace_stop_flag);
+		// printf("control host: %d\n",control_power_data.host);
+		//printf("empower: %d\n", empower_data.empower);
+		//printf("%d",trace_pot_x);
+		//printf("%d\n",trace_stop_flag);
 		location_time++;
 		read_remote_channel_time++;
 		while(TimingDelay!=0x00);

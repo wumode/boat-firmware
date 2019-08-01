@@ -46,11 +46,9 @@ typedef struct VelocityDataTrans {
 }VelocityDataTrans;
 #define VELOCITY_FLAG 0xf3
 
-//?????
 typedef struct ControlPowerTrans {
 	u8 host;
 }ControlPowerTrans;
-//??????
 #define CONTROL_POWER_FLAG 0xf4
 
 typedef struct RemoteChannelTrans{
@@ -62,9 +60,19 @@ typedef struct RemoteChannelTrans{
 #define REMOTE_CHANNEL_FLAG 0xf5
 
 typedef struct EmpowerTrans{
-    uint8_t empower;
+    volatile uint8_t empower;
 }EmpowerTrans;
 #define EMPOWER_FLAG 0xf6
+
+typedef struct LockingTrans{
+    uint8_t locking;
+}LockingTrans;
+#define LOCKING_FLAG 0xf7
+
+typedef struct StopTrans{
+    volatile uint8_t stop;
+}StopTrans;
+#define STOP_FLAG 0xf9
 
 typedef struct CradlePwm{
 	volatile uint8_t servo_up;   
@@ -78,10 +86,15 @@ extern VelocityDataTrans velocity_data;
 extern ControlPowerTrans control_power_data;
 extern RemoteChannelTrans remote_channel_data;
 extern EmpowerTrans empower_data;
+extern LockingTrans locking_data;
+extern StopTrans stop_data;
 
 extern volatile uint8_t gps_updated;
 extern volatile uint8_t imu_updated;
 extern volatile uint8_t velocity_updated;
 extern uint8_t servo_pwm_updated;
+
+extern uint8_t laser_set;
+extern uint8_t last_laser_set;
 //extern u32 CHANNEL_HIGHOUTPUT[4];
 #endif

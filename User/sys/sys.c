@@ -10,10 +10,10 @@ extern void WatchDog_Init(void);
 
 void Init(void){
 	LED_GPIO_Config();
-	USART1_Config(115200);
+	USART1_Config(921600);
 	USART2_Config(921600);
 	USART3_Config(115200);
-	USART4_Config(115200);
+	USART4_Config(921600);
 	USART5_Config(460800);
 	imu_updated = 0;
 	gps_updated = 0;
@@ -46,10 +46,14 @@ void Init(void){
 	//EXTI_PB14_Config();
 	//OLED_Init(); 
 	gps_initialized = 0;
+	laser_set = 0;
+	last_laser_set = laser_set;
+	locking_data.locking = 0;
+	stop_laser = 0;
+	stop_motor = 0;
+	stop_data.stop = 0;
 	//LED(OFF);
-	//location_info.location.flag = LOCATION_FLAG;
 	
-	//stop_motor = 0;
 	//line_length = 0;
 	//gps_info.fix_quality = 0;
 	//attitude_angle = 0.0;

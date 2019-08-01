@@ -3,7 +3,7 @@
 #include "stm32f10x.h"
 #include "sys_config.h"
 
-#define CAPTURE_PERIOD 149
+#define CAPTURE_PERIOD 99
 #define CAPTURE_PRESCALER 71
 
 void TIM2_Capture_Init(u16 arr,u16 psc);

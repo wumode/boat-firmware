@@ -19,6 +19,8 @@ void DT_Send_Velocity(const VelocityDataTrans* velocity_data_trans);
 
 void DT_Send_ControlPower(const ControlPowerTrans* control_power_data_trans);
 
+void DT_Send_Locking(const LockingTrans* locking_data_trans);
+
 void DT_Imu_Parse(u8* buffer, ImuDataTrans* imu_data_trans);
 
 void DT_Gps_Parse(u8* buffer, GpsDataTrans* gps_data_trans);

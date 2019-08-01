@@ -27,7 +27,8 @@ float Velocity_KP=PID_P,Velocity_KI=PID_I, Velocity_KD=PID_D;
 int Encoder[2];   
 int Target[2];
 
-char stop_motor;
+uint8_t stop_laser;
+uint8_t stop_motor;
 
 ImuDataTrans imu_data;
 GpsDataTrans gps_data;
@@ -35,6 +36,9 @@ VelocityDataTrans velocity_data;
 ControlPowerTrans control_power_data;
 RemoteChannelTrans remote_channel_data;
 EmpowerTrans empower_data;
+LockingTrans locking_data;
+StopTrans stop_data;
+
 CradlePwm cradle_pwm;
 
 u16 TIM2_CH1_STATUS,TIM2_CH2_STATUS,TIM2_CH3_STATUS,TIM2_CH4_STATUS;
@@ -49,7 +53,9 @@ uint8_t servo_pwm_updated;
 
 int gps_initialized;
 
-const float (*now_point)[2];
+//const float (*now_point)[2];
+uint8_t laser_set;
+uint8_t last_laser_set;
 
 int main(void){
 	//CLI();

@@ -1,6 +1,5 @@
 #include "laser.h"
 
-u8 laser_set = 0;
 void Laser_Init(void) 
 {
 	  /*GPIO_InitTypeDef  GPIO_InitStructure;	
@@ -9,7 +8,7 @@ void Laser_Init(void)
 		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 		GPIO_Init(GPIOE ,&GPIO_InitStructure);*/
-  GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitTypeDef GPIO_InitStructure;
 	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 	TIM_OCInitTypeDef  TIM_OCInitStructure;
 	
@@ -47,21 +46,31 @@ void Laser_Init(void)
 	TIM_CtrlPWMOutputs(TIM1,ENABLE);
 	TIM_ARRPreloadConfig(TIM1, ENABLE);
 	TIM_Cmd(TIM1, ENABLE);
-	//TIM1->CCR1 = 7199;
 }
+
+
+void LaserControl(uint8_t status, uint16_t ccr){
+	if(status){
+		TIM1->CCR1 = 7199 - ccr;
+	}
+	else{
+		TIM1->CCR1 = 7199;
+	}
+}
+
 void Laser_control()
 {
 	
 	//printf("laser set: %d, empower: %d", laser_set, empower_data.empower);
-	 if(laser_set==1&&empower_data.empower==1)
-	 {
-		 TIM1->CCR1 = 0;
-    // laser_set = 0;
+	if(laser_set==1 && empower_data.empower==1)
+	{
+		TIM1->CCR1 = 0;
+		// laser_set = 0;
 	    //GPIO_SetBits(GPIOE,GPIO_Pin_9);
-	 }
-	 else
-	 {
-		 TIM1->CCR1 = 7199;
-	   // GPIO_ResetBits(GPIOE,GPIO_Pin_9);
-	 }
+	}
+	else
+	{
+		TIM1->CCR1 = 7199;
+		// GPIO_ResetBits(GPIOE,GPIO_Pin_9);
+	}
 }

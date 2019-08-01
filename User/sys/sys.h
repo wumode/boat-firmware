@@ -15,6 +15,9 @@
 #define CLI() __set_PRIMASK(1) //总中断关闭
 #define SEI() __set_PRIMASK(0) //总中断开启
 
+#define ON 1
+#define OFF 0
+
 //Ex_NVIC_Config专用定义
 #define GPIO_A 0
 #define GPIO_B 1
@@ -59,11 +62,12 @@
 extern float Velocity_KP,Velocity_KI, Velocity_KD;	
 extern int Encoder[2];
 extern int Target[2];
-extern char stop_motor;
+extern uint8_t stop_motor;
+extern uint8_t stop_laser;
 
 //extern SerialDataInfo serial_data_info;
-extern const float (*now_point)[2];
-extern const float KeyPoints [][2];
+//extern const float (*now_point)[2];
+//extern const float KeyPoints [][2];
 extern int gps_initialized;
 
 void Init(void);

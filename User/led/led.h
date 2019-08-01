@@ -1,7 +1,5 @@
 #ifndef LED_H
 #define LED_H
-#define ON 1
-#define OFF 0
 
 #define LED_ON GPIO_ResetBits(GPIOE, GPIO_Pin_6)
 #define LED_OFF GPIO_SetBits(GPIOE, GPIO_Pin_6)

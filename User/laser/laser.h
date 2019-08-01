@@ -8,8 +8,8 @@
 #define LASER_PWM_TIM_Prescaler	  0
 #define LASER_INIT 				  7199
 
-extern u8 laser_set;
 void Laser_Init(void);
 void Laser_control(void);
+void LaserControl(uint8_t status, uint16_t ccr);
 
 #endif
