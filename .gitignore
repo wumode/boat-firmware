@@ -9,6 +9,8 @@ Project/
 *.lnp
 *.iex
 *.axf
+*.dep
+*.Bak
 
 =======
 >>>>>>> ae4227a0fe3bf3b78d63ffe13d6d1393790c26e9
