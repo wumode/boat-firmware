@@ -60,7 +60,7 @@ void Init(void){
 	//now_point_num = 0;
 	//RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO ,ENABLE);
 	//while(!gps_updated);
-	control_power_data.host = 1;
+	//control_power_data.host = 2;
 	WatchDog_Init();
 }
 

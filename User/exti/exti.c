@@ -33,7 +33,7 @@ void EXTI15_10_IRQHandler(void){
 	if(EXTI_GetFlagStatus(EXTI_Line14) != RESET) 
 	{
 		//LED_TOGGLE;
-		printf("a");
+		
 	}
 	EXTI_ClearITPendingBit(EXTI_Line14);
 }
@@ -113,11 +113,11 @@ void judge2(void)
  void EXTI0_IRQHandler(void)
 {
 	//temp1=temp1+48;
-	printf("a");
+	//printf("a");
 	if(EXTI_GetFlagStatus(EXTI_Line0) != RESET) 
 	{
 		//LED_TOGGLE;
-		printf("a");
+		//printf("a");
 	}
 	//USART_SendData(USART1,0xFF);
 	EXTI_ClearITPendingBit(EXTI_Line0);

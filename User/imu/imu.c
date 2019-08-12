@@ -77,7 +77,6 @@ void CopeSerial2Data_1(uint8_t ucData_1)
 			case 0x52:{	
 				memcpy(&stcGyro,&ucRxBuffer_1[2],8);
 				imu_data.angular_velocity_z = (float)stcGyro.w[2]/32768*2000*PI/180;
-				//printf("r: %f", imu_data.angular_velocity_z);
 				break;
 			}
 			case 0x53:	{

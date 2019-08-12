@@ -121,6 +121,7 @@ void DT_Velocity_Parse(u8* buffer, VelocityDataTrans* velocity_data_trans) {
 
 void DT_ControlPower_Parse(u8* buffer, ControlPowerTrans* control_power_data_trans) {
     memcpy(control_power_data_trans, buffer, sizeof(ControlPowerTrans));
+	//printf("control host: %d\n",control_power_data.host);
 }
 
 void DT_Empower_Parse(u8* buffer, EmpowerTrans* empower_trans) {

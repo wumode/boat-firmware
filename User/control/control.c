@@ -123,27 +123,33 @@ void Remote(const RemoteChannelTrans* rm_trans, MotorPwm* m_p ){
 	}
 }
 
-u8 trace_pot_x;
-u8 trace_pot_y;
+u8 trace_pot_x = 80;
+u8 trace_pot_y = 60;
 float trace_error_ori; 
 float trace_error_last;
 float trace_error; 
-u8 trace_stop_flag = 0;
+u8 trace_stop_flag = 1;
 
 void trace_control(void)
 {
 	MotorPwm motor_trace_pwm;
 	trace_error_ori = 80 - trace_pot_x; 
-	trace_error = 0.01*trace_error_ori + 0*(trace_error_ori-trace_error_last);
+	trace_error = 0.015*trace_error_ori + 0*(trace_error_ori-trace_error_last);
+	if(trace_error>1.5){
+		trace_error = 1.5;
+	}
+	else if(trace_error<-1.5){
+		trace_error = -1.5;
+	}
 	trace_error_last = trace_error_ori;
+	velocity_data.velocity_angle = trace_error;
 	if(trace_stop_flag == 0)
 	{
-		velocity_data.velocity_angle = trace_error;
-		velocity_data.velocity_x = 1-0.2*fabs(trace_error);
+		velocity_data.velocity_x = 0.6;
 	}
 	else
 	{
-		velocity_data.velocity_angle=0;
+		//velocity_data.velocity_angle = 0;
 		velocity_data.velocity_x=0;
 	}
 	SpeedAnalyze(&velocity_data, &motor_trace_pwm);
@@ -159,13 +165,13 @@ void mode_choose_openmv(void)
 	{
 		Usart4_SendByte(3);
 	}
-  if(control_power_data.host ==3)
+  else if(control_power_data.host ==3)
 	{
 		Usart4_SendByte(2);
 	}
-	if(control_power_data.host ==1)
+	else if(control_power_data.host ==1)
 	{
-	  Usart4_SendByte(0);
+	  Usart4_SendByte(1);
 	}
 }
 
@@ -252,34 +258,38 @@ void control(void){
 		}
 		if(imu_updated){
 			imu_updated = 0;
-			//printf("c: %f\n", imu_data.angular_velocity_z);
+			//printf("f: %f\n", imu_data.angular_velocity_z);
 			DT_Send_Imu(&imu_data);
 		}
 		if(gps_updated){
 			gps_updated = 0;
 			DT_Send_Gps(&gps_data);
 		}
-		if(velocity_updated){
-			velocity_updated = 0;
-			SpeedAnalyze(&velocity_data, &motor_pwm);
-			LimitPwm(&motor_pwm);
-			//printf("pwm: %d-%d\n", motor_pwm.right, motor_pwm.left);
-			PwmApplicate(&motor_pwm);
-		}
-		
+		//printf("aa\n");
 //		if(servo_pwm_updated){
 //			servo_pwm_updated = 0;
 //			ServoPwmSet(cradle_pwm.servo_up, 1);
 //			ServoPwmSet(cradle_pwm.servo_down, 2);
 //		}
+		if(control_power_data.host == 1)
+		{
+			laser_set=0;
+			if(velocity_updated){
+				velocity_updated = 0;
+				SpeedAnalyze(&velocity_data, &motor_pwm);
+				LimitPwm(&motor_pwm);
+				PwmApplicate(&motor_pwm);
+			}
+		}
 		if(control_power_data.host == 2)
 		{
 			trace_control();
+			laser_set=0;
 		}
 		if(control_power_data.host == 3)
 		{
-			velocity_data.velocity_angle=0;
-			velocity_data.velocity_x=0;
+//			velocity_data.velocity_angle=0;
+//			velocity_data.velocity_x=0;
 			SpeedAnalyze(&velocity_data, &motor_pwm);
 			LimitPwm(&motor_pwm);
 			//printf("pw_tracem: %;d-%d\n", motor_pwm.right, motor_pwm.left);
@@ -321,10 +331,10 @@ void control(void){
 		mode_choose_openmv();
 		//TIM1->CCR1 = 6000;
 		//A=GPIO_ReadOutputDataBit(GPIOE,GPIO_Pin_9);
-		// printf("control host: %d\n",control_power_data.host);
+		printf("main control host: %d\n",control_power_data.host);
 		//printf("empower: %d\n", empower_data.empower);
-		//printf("%d",trace_pot_x);
-		//printf("%d\n",trace_stop_flag);
+		//printf("trace_pot_x: %d ",trace_pot_x);
+		//printf("trace_stop_flag: %d\n",trace_stop_flag);
 		location_time++;
 		read_remote_channel_time++;
 		while(TimingDelay!=0x00);
