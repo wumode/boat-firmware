@@ -9,6 +9,8 @@ Project/
 *.lnp
 *.iex
 *.axf
+*.map
+*.dep
 
 # Prerequisites
 *.d

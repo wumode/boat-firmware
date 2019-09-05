@@ -33,12 +33,14 @@ uint8_t stop_motor;
 ImuDataTrans imu_data;
 GpsDataTrans gps_data;
 VelocityDataTrans velocity_data;
-ControlPowerTrans control_power_data;
+//ControlPowerTrans control_power_data;
 RemoteChannelTrans remote_channel_data;
 EmpowerTrans empower_data;
 LockingTrans locking_data;
 StopTrans stop_data;
-
+ModeTrans mode_data;
+BehaviorTrans behavior_data;
+BehaviorParamsTrans behavior_params_data;
 CradlePwm cradle_pwm;
 
 u16 TIM2_CH1_STATUS,TIM2_CH2_STATUS,TIM2_CH3_STATUS,TIM2_CH4_STATUS;

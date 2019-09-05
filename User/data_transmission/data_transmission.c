@@ -18,7 +18,7 @@ void DT_Send_Imu(const ImuDataTrans* imu_data_trans)
     uint8_t data_length = sizeof(ImuDataTrans);
     tx_buffer_[0] = send_head_high_;
     tx_buffer_[1] = send_head_low_;
-    tx_buffer_[2] = IMU_FLAG;
+    tx_buffer_[2] = kIMU_FLAG;
     tx_buffer_[3] = sizeof(ImuDataTrans);
     memcpy(tx_buffer_+4, (void*)imu_data_trans, data_length);
     uint8_t sum = 0;
@@ -34,7 +34,7 @@ void DT_Send_RemoteChannel(const RemoteChannelTrans* remote_channel_data_trans){
 	uint8_t data_length = sizeof(RemoteChannelTrans);
     tx_buffer_[0] = send_head_high_;
     tx_buffer_[1] = send_head_low_;
-    tx_buffer_[2] = REMOTE_CHANNEL_FLAG;
+    tx_buffer_[2] = kREMOTE_CHANNEL_FLAG;
     tx_buffer_[3] = sizeof(RemoteChannelTrans);
     memcpy(tx_buffer_+4, (void*)remote_channel_data_trans, data_length);
     uint8_t sum = 0;
@@ -50,7 +50,7 @@ void DT_Send_Gps(const GpsDataTrans* gps_data_trans)
     uint8_t data_length = sizeof(GpsDataTrans);
     tx_buffer_[0] = send_head_high_;
     tx_buffer_[1] = send_head_low_;
-    tx_buffer_[2] = GPS_FLAG;
+    tx_buffer_[2] = kGPS_FLAG;
     tx_buffer_[3] = sizeof(GpsDataTrans);
     memcpy(tx_buffer_+4, (void*)gps_data_trans, data_length);
     uint8_t sum = 0;
@@ -65,7 +65,7 @@ void DT_Send_Velocity(const VelocityDataTrans* velocity_data_trans)
     uint8_t data_length = sizeof(VelocityDataTrans);
     tx_buffer_[0] = send_head_high_;
     tx_buffer_[1] = send_head_low_;
-    tx_buffer_[2] = VELOCITY_FLAG;
+    tx_buffer_[2] = kVELOCITY_FLAG;
     tx_buffer_[3] = sizeof(VelocityDataTrans);
     memcpy(tx_buffer_+4, (void*)velocity_data_trans, data_length);
     uint8_t sum = 0;
@@ -80,7 +80,7 @@ void DT_Send_ControlPower(const ControlPowerTrans* control_power_data_trans) {
     uint8_t data_length = sizeof(ControlPowerTrans);
     tx_buffer_[0] = send_head_high_;
     tx_buffer_[1] = send_head_low_;
-    tx_buffer_[2] = CONTROL_POWER_FLAG;
+    tx_buffer_[2] = kCONTROL_POWER_FLAG;
     tx_buffer_[3] = sizeof(ControlPowerTrans);
     memcpy(tx_buffer_+4, (void*)control_power_data_trans, data_length);
     uint8_t sum = 0;
@@ -95,7 +95,7 @@ void DT_Send_Locking(const LockingTrans* locking_data_trans){
 	uint8_t data_length = sizeof(LockingTrans);
     tx_buffer_[0] = send_head_high_;
     tx_buffer_[1] = send_head_low_;
-    tx_buffer_[2] = LOCKING_FLAG;
+    tx_buffer_[2] = kLOCKING_FLAG;
     tx_buffer_[3] = sizeof(LockingTrans);
     memcpy(tx_buffer_+4, (void*)locking_data_trans, data_length);
     uint8_t sum = 0;
@@ -132,6 +132,19 @@ void DT_Stop_Parse(u8* buffer, StopTrans* stop_trans) {
     memcpy(stop_trans, buffer, sizeof(StopTrans));
 }
 
+
+void DT_Mode_Parse(u8* buffer, ModeTrans* mode_trans) {
+    memcpy(mode_trans, buffer, sizeof(ModeTrans));
+}
+
+void DT_Behavior_Parse(u8* buffer, BehaviorTrans* behavior_trans) {
+    memcpy(behavior_trans, buffer, sizeof(BehaviorTrans));
+}
+
+void DT_BehaviorParams_Parse(u8* buffer, BehaviorParamsTrans* behavior_params_trans) {
+    memcpy(behavior_params_trans, buffer, sizeof(BehaviorParamsTrans));
+}
+
 /*----------------------------------------------------------
 + 实现功能：数据分析
 + 调用参数：传入接受到的一个数据帧和长度
@@ -156,25 +169,32 @@ void DT_Data_Receive_Anl(u8 *data_buf, u8 num)
 
 	}
 	/* 判断功能字： */
-	else if (*(data_buf + 2) == IMU_FLAG)
+	else if (*(data_buf + 2) == kIMU_FLAG)
 	{
 		DT_Imu_Parse(data_buf + 4, &imu_data);
 	}
-	else if (*(data_buf + 2) == GPS_FLAG)
+	else if (*(data_buf + 2) == kGPS_FLAG)
 	{
 		DT_Gps_Parse(data_buf + 4, &gps_data);
 	}
-	else if (*(data_buf + 2) == VELOCITY_FLAG) {
+	else if (*(data_buf + 2) == kVELOCITY_FLAG) {
 		DT_Velocity_Parse(data_buf + 4, &velocity_data);
 	}
-	else if (*(data_buf + 2) == CONTROL_POWER_FLAG) {
-		DT_ControlPower_Parse(data_buf + 4, &control_power_data);
-	}
-	else if(*(data_buf + 2) == EMPOWER_FLAG) {
+	
+	else if(*(data_buf + 2) == kEMPOWER_FLAG) {
 		DT_Empower_Parse(data_buf + 4, &empower_data);
 	}
-	else if(*(data_buf + 2) == STOP_FLAG){
+	else if(*(data_buf + 2) == kSTOP_FLAG){
 		DT_Stop_Parse(data_buf + 4, &stop_data);
+	}
+	else if(*(data_buf + 2) == kMODE_FLAG){
+		DT_Mode_Parse(data_buf + 4, &mode_data);
+	}
+	else if(*(data_buf + 2) == kBEHAVIOR_FLAG){
+		DT_Behavior_Parse(data_buf + 4, &behavior_data);
+	}
+	else if(*(data_buf + 2) == KBEHAVIOR_PARAMS_FLAG){
+		DT_BehaviorParams_Parse(data_buf + 4, &behavior_params_data);
 	}
 }
 

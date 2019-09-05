@@ -161,18 +161,25 @@ void trace_control(void)
 void mode_choose_openmv(void)
 {
 
-  if(control_power_data.host ==2)
-	{
-		Usart4_SendByte(3);
+//  if(mode_data.mode == track_mode)
+//	{
+//		Usart4_SendByte(3);
+//	}
+//	else if(mode_data.mode == navigation_mode)
+//	{
+//	  Usart4_SendByte(1);
+//	}
+//	else if(mode_data.mode == remote_mode){
+//		Usart4_SendByte(1);
+//	}
+	if(behavior_data.behavior==kNoBehavior){
+		Usart4_SendByte(0);
 	}
-  else if(control_power_data.host ==3)
+  else if((behavior_data.behavior & kAttack)!= kNoBehavior)
 	{
-		Usart4_SendByte(2);
+		Usart4_SendByte(1);
 	}
-	else if(control_power_data.host ==1)
-	{
-	  Usart4_SendByte(1);
-	}
+	
 }
 
 void MotorInit(){
@@ -265,15 +272,22 @@ void control(void){
 			gps_updated = 0;
 			DT_Send_Gps(&gps_data);
 		}
-		//printf("aa\n");
-//		if(servo_pwm_updated){
-//			servo_pwm_updated = 0;
-//			ServoPwmSet(cradle_pwm.servo_up, 1);
-//			ServoPwmSet(cradle_pwm.servo_down, 2);
-//		}
-		if(control_power_data.host == 1)
+		if(mode_data.mode == remote_mode)
 		{
-			laser_set=0;
+			if(velocity_updated){
+				
+				velocity_updated = 0;
+				SpeedAnalyze(&velocity_data, &motor_pwm);
+				LimitPwm(&motor_pwm);
+				PwmApplicate(&motor_pwm);
+			}
+		}
+		else if(mode_data.mode == track_mode)
+		{
+			trace_control();
+		}
+		else if(mode_data.mode == navigation_mode)
+		{
 			if(velocity_updated){
 				velocity_updated = 0;
 				SpeedAnalyze(&velocity_data, &motor_pwm);
@@ -281,19 +295,12 @@ void control(void){
 				PwmApplicate(&motor_pwm);
 			}
 		}
-		if(control_power_data.host == 2)
-		{
-			trace_control();
-			laser_set=0;
+		
+		if(behavior_data.behavior == kNoBehavior){
+			laser_set = 0;
 		}
-		if(control_power_data.host == 3)
-		{
-//			velocity_data.velocity_angle=0;
-//			velocity_data.velocity_x=0;
-			SpeedAnalyze(&velocity_data, &motor_pwm);
-			LimitPwm(&motor_pwm);
-			//printf("pw_tracem: %;d-%d\n", motor_pwm.right, motor_pwm.left);
-			PwmApplicate(&motor_pwm);
+		else if((behavior_data.behavior|kAttack) != kNoBehavior){
+			
 		}
 		 
 		if(laser_set!=last_laser_set){
@@ -327,13 +334,17 @@ void control(void){
 		//printf("motor: %d-%d\n", motor_pwm.right, motor_pwm.left);
 		//PwmApplicate(&motor_pwm);
 		//LaserSetPwm(6000);
-		Laser_control();
+		LaserControl(laser_set==1 && empower_data.empower==1 && stop_laser == 0, behavior_params_data.laser_intensity);
+		//mode_data.mode = 1;
+		//behavior_data.behavior = 1;
 		mode_choose_openmv();
+		//printf("mode: %d\n", mode_data.mode);
+		//printf("behavior: %d\n", behavior_data.behavior);
+		//printf("intensity: %d\n", behavior_params_data.laser_intensity);
 		//TIM1->CCR1 = 6000;
 		//A=GPIO_ReadOutputDataBit(GPIOE,GPIO_Pin_9);
-		printf("main control host: %d\n",control_power_data.host);
 		//printf("empower: %d\n", empower_data.empower);
-		//printf("trace_pot_x: %d ",trace_pot_x);
+		//printf("laser_set: %d\n",laser_set);
 		//printf("trace_stop_flag: %d\n",trace_stop_flag);
 		location_time++;
 		read_remote_channel_time++;

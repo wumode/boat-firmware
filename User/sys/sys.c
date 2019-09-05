@@ -10,7 +10,7 @@ extern void WatchDog_Init(void);
 
 void Init(void){
 	LED_GPIO_Config();
-	USART1_Config(921600);
+	USART1_Config(460800);
 	USART2_Config(921600);
 	USART3_Config(115200);
 	USART4_Config(921600);
@@ -22,7 +22,6 @@ void Init(void){
 	
 	velocity_data.velocity_x = 0.0;
 	velocity_data.velocity_angle = 0.0;
-	control_power_data.host = 1;
 	
 	imu_data.angular_velocity_z = 0.0;
 	imu_data.linear_acceleration_x = 0.0;
@@ -52,6 +51,8 @@ void Init(void){
 	stop_laser = 0;
 	stop_motor = 0;
 	stop_data.stop = 0;
+	mode_data.mode = remote_mode;
+	behavior_params_data.laser_intensity = 10;
 	//LED(OFF);
 	
 	//line_length = 0;

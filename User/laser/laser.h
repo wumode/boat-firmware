@@ -10,6 +10,6 @@
 
 void Laser_Init(void);
 void Laser_control(void);
-void LaserControl(uint8_t status, uint16_t ccr);
+void LaserControl(uint8_t status, uint16_t intensity);
 
 #endif

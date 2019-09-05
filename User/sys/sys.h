@@ -62,8 +62,6 @@
 extern float Velocity_KP,Velocity_KI, Velocity_KD;	
 extern int Encoder[2];
 extern int Target[2];
-extern uint8_t stop_motor;
-extern uint8_t stop_laser;
 
 //extern SerialDataInfo serial_data_info;
 //extern const float (*now_point)[2];

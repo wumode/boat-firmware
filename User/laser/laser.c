@@ -49,20 +49,18 @@ void Laser_Init(void)
 }
 
 
-void LaserControl(uint8_t status, uint16_t ccr){
+void LaserControl(uint8_t status, uint16_t intensity){
 	if(status){
-		TIM1->CCR1 = 7199 - ccr;
+		TIM1->CCR1 = LASER_PWM_TIM_Period - (int)(LASER_PWM_TIM_Period*intensity/100.0);
 	}
 	else{
-		TIM1->CCR1 = 7199;
+		TIM1->CCR1 = LASER_PWM_TIM_Period;
 	}
 }
 
 void Laser_control()
 {
-	
-	//printf("laser set: %d, empower: %d", laser_set, empower_data.empower);
-	if(laser_set==1 && empower_data.empower==1)
+	if(laser_set==1 && empower_data.empower==1 && stop_laser == 0)
 	{
 		TIM1->CCR1 = 0;
 		// laser_set = 0;
@@ -70,7 +68,7 @@ void Laser_control()
 	}
 	else
 	{
-		TIM1->CCR1 = 7199;
+		TIM1->CCR1 = LASER_PWM_TIM_Period;
 		// GPIO_ResetBits(GPIOE,GPIO_Pin_9);
 	}
 }
